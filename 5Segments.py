@@ -15,8 +15,9 @@ import glob
 import pylink
 from importlib import reload
 import sys
-
+# %%
 sys.path.append('/Users/visionlab/Documents/Project_Harry_S/7LineSegments')
+sys.path.append('/Users/harrysteinharter/Documents/MSc/Timo Internship/7LineSegments')
 import otherFunctions as OF # Has to go after changing directory bc of it's location
 reload(OF) # Allows me to edit OF w/out restartig VSCode
 
@@ -61,9 +62,8 @@ if dummy == True:
     tracker = pylink.EyeLink(None)
 else:
     tracker = pylink.EyeLink("100.1.1.2:255.255.255.0")  # our eyelink is at 100.1.1.2:255.255.255.0. default is 100.1.1.1:...
-
-tracker.openDataFile(eyeHostFile)
-tracker.sendCommand("screen_pixel_coords = 0 0 1919 1079")
+    tracker.openDataFile(eyeHostFile)
+    tracker.sendCommand("screen_pixel_coords = 0 0 1919 1079")
 
 def closeTracker(tracker,eyeHostFile,eyeLocalFile):
     tracker.closeDataFile()
@@ -71,13 +71,13 @@ def closeTracker(tracker,eyeHostFile,eyeLocalFile):
     tracker.close()
 
 pylink.openGraphics()
-tracker.doTrackerSetup()
+if not dummy: tracker.doTrackerSetup()
 pylink.closeGraphics()
 ############################################################################
 # %%
 # Open a CSV file to store the data
 dataFile = open(fullFile+'.csv', 'w') 
-dataFile.write('Participant_Number,Trial_Number,Condition,FCfar,FCmed,FCclose,Target_Contrast,Correct_Response,Reaction_Time\n')
+dataFile.write('Participant_Number,Trial_Number,Condition,FC_distal,FC_proximal,Target_Contrast,Correct_Response,Reaction_Time\n')
 
 # Set up the window and visual elements   #####REMEMBER TO CHANGE MONITOR to `flanders` from `myMacbook`#######
 mywin = visual.Window(fullscr=True, monitor="Flanders", units="deg",colorSpace='rgb',color = [0,0,0],bpc=(10,10,10),depthBits=10)
@@ -157,65 +157,60 @@ nReal = 18 # 18 was last experiment
 nNull = 2 # 2 was last experiment4646
 # Define experimental conditions (Different staircase procedures which run independently and randomly)
 conditions=[
-    {"label":"FarHighNarrow",'startVal': .1, "FCfar":0.2, "FCmed":0.15, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarLowNarrow",'startVal': .1,  "FCfar":0.1, "FCmed":0.15, "FCclose":0.2,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarHighWide",'startVal': .1,   "FCfar":0.5, "FCmed":0.25, "FCclose":0.03, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarLowWide",'startVal': .1,    "FCfar":0.03, "FCmed":0.25, "FCclose":0.5, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"Constant",'startVal': .1,      "FCfar":0.1, "FCmed":0.1, "FCclose":0.1,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Control",'startVal': .1,      "FCmed":0.00, "FCclose":0.10,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Control",'startVal': .1,      "FCmed":0.00, "FCclose":0.25,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Equal",'startVal': .1,        "FCmed":0.25, "FCclose":0.25, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Equal",'startVal': .1,        "FCmed":0.10, "FCclose":0.10, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Increase",'startVal': .1,     "FCmed":0.10, "FCclose":0.25,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Decrease",'startVal': .1,     "FCmed":0.25, "FCclose":0.10,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
     
 #Null conditions. Are identical, except some (or all) lines do not get drawn
         # Calculate p' = (p-fp)/(1-fp) where p = positive rate, fp = false positive rate
         # Calculate it for each shape at each contrast level
 
-    #C_null shapes
-    {"label":"FarHighNarrow_null",'startVal': .1, "FCfar":0.2, "FCmed":0.15, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarLowNarrow_null",'startVal': .1,  "FCfar":0.1, "FCmed":0.15, "FCclose":0.2,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarHighWide_null",'startVal': .1,   "FCfar":0.5, "FCmed":0.25, "FCclose":0.03, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarLowWide_null",'startVal': .1,    "FCfar":0.03, "FCmed":0.25, "FCclose":0.5, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"Constant_null",'startVal': .1,      "FCfar":0.1, "FCmed":0.1, "FCclose":0.1,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-    # Control w/ 3 lines
-    {"label":"ThreeLinesControl",'startVal': .1, "FCfar":0.0, "FCmed":0.0, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"ThreeLinesControl_null",'startVal': .1, "FCfar":0.0, "FCmed":0.0, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-
+    {"label":"Control_null",'startVal': .1,      "FCmed":0.00, "FCclose":0.10,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Control_null",'startVal': .1,      "FCmed":0.00, "FCclose":0.25,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Equal_null",'startVal': .1,        "FCmed":0.25, "FCclose":0.25, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Equal_null",'startVal': .1,        "FCmed":0.10, "FCclose":0.10, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Increase_null",'startVal': .1,     "FCmed":0.10, "FCclose":0.25,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Decrease_null",'startVal': .1,     "FCmed":0.25, "FCclose":0.10,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
 ]
 
 exp_cons = [
-    {"label":"FarHighNarrow",'startVal': .1, "FCfar":0.2, "FCmed":0.15, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarLowNarrow",'startVal': .1,  "FCfar":0.1, "FCmed":0.15, "FCclose":0.2,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarHighWide",'startVal': .1,   "FCfar":0.5, "FCmed":0.25, "FCclose":0.03, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarLowWide",'startVal': .1,    "FCfar":0.03, "FCmed":0.25, "FCclose":0.5, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"Constant",'startVal': .1,      "FCfar":0.1, "FCmed":0.1, "FCclose":0.1,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"ThreeLinesControl",'startVal': .1, "FCfar":0.0, "FCmed":0.0, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
-
+    {"label":"Control",'startVal': .1,      "FCmed":0.00, "FCclose":0.10,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Control",'startVal': .1,      "FCmed":0.00, "FCclose":0.25,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Equal",'startVal': .1,        "FCmed":0.25, "FCclose":0.25, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Equal",'startVal': .1,        "FCmed":0.10, "FCclose":0.10, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Increase",'startVal': .1,     "FCmed":0.10, "FCclose":0.25,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Decrease",'startVal': .1,     "FCmed":0.25, "FCclose":0.10,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
 ]
 
 null_cons = [
     #_null shapes
-    {"label":"FarHighNarrow_null",'startVal': .1, "FCfar":0.2, "FCmed":0.15, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarLowNarrow_null",'startVal': .1,  "FCfar":0.1, "FCmed":0.15, "FCclose":0.2,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarHighWide_null",'startVal': .1,   "FCfar":0.5, "FCmed":0.25, "FCclose":0.03, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"FarLowWide_null",'startVal': .1,    "FCfar":0.03, "FCmed":0.25, "FCclose":0.5, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"Constant_null",'startVal': .1,      "FCfar":0.1, "FCmed":0.1, "FCclose":0.1,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
-    {"label":"ThreeLinesControl_null",'startVal': .1, "FCfar":0.0, "FCmed":0.0, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Control_null",'startVal': .1,      "FCmed":0.00, "FCclose":0.10,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Control_null",'startVal': .1,      "FCmed":0.00, "FCclose":0.25,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Equal_null",'startVal': .1,        "FCmed":0.25, "FCclose":0.25, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Equal_null",'startVal': .1,        "FCmed":0.10, "FCclose":0.10, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Increase_null",'startVal': .1,     "FCmed":0.10, "FCclose":0.25,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
+    {"label":"Decrease_null",'startVal': .1,     "FCmed":0.25, "FCclose":0.10,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},
 ]
 
 global condition_counters
 condition_counters = [
     # Exp
-    [{"label":"FarHighNarrow",'startVal': .1, "FCfar":0.2, "FCmed":0.15, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1}, 1, nReal*nBlocks],
-    [{"label":"FarLowNarrow",'startVal': .1,  "FCfar":0.1, "FCmed":0.15, "FCclose":0.2,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1}, 1, nReal*nBlocks],
-    [{"label":"FarHighWide",'startVal': .1,   "FCfar":0.5, "FCmed":0.25, "FCclose":0.03, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1}, 1, nReal*nBlocks],
-    [{"label":"FarLowWide",'startVal': .1,    "FCfar":0.03, "FCmed":0.25, "FCclose":0.5, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1}, 1, nReal*nBlocks],
-    [{"label":"Constant",'startVal': .1,      "FCfar":0.1, "FCmed":0.1, "FCclose":0.1,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1}, 1, nReal*nBlocks],
-    [{"label":"ThreeLinesControl",'startVal': .1, "FCfar":0.0, "FCmed":0.0, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1}, 1, nReal*nBlocks],
+    [{"label":"Control",'startVal': .1,      "FCmed":0.00, "FCclose":0.10,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},         1, nReal*nBlocks],
+    [{"label":"Control",'startVal': .1,      "FCmed":0.00, "FCclose":0.25,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},     1, nReal*nBlocks],
+    [{"label":"Equal",'startVal': .1,        "FCmed":0.25, "FCclose":0.25, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},      1, nReal*nBlocks],
+    [{"label":"Equal",'startVal': .1,        "FCmed":0.10, "FCclose":0.10, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},      1, nReal*nBlocks],
+    [{"label":"Increase",'startVal': .1,     "FCmed":0.10, "FCclose":0.25,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},    1, nReal*nBlocks],
+    [{"label":"Decrease",'startVal': .1,     "FCmed":0.25, "FCclose":0.10,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},    1, nReal*nBlocks],
     # Null
-    # C
-    [{"label":"FarHighNarrow_null",'startVal': .1, "FCfar":0.2, "FCmed":0.15, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1}, 1, nNull*nBlocks],
-    [{"label":"FarLowNarrow_null",'startVal': .1,  "FCfar":0.1, "FCmed":0.15, "FCclose":0.2,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1}, 1, nNull*nBlocks],
-    [{"label":"FarHighWide_null",'startVal': .1,   "FCfar":0.5, "FCmed":0.25, "FCclose":0.03, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1}, 1, nNull*nBlocks],
-    [{"label":"FarLowWide_null",'startVal': .1,    "FCfar":0.03, "FCmed":0.25, "FCclose":0.5, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1}, 1, nNull*nBlocks],
-    [{"label":"Constant_null",'startVal': .1,      "FCfar":0.1, "FCmed":0.1, "FCclose":0.1,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1}, 1, nNull*nBlocks],
-    [{"label":"ThreeLinesControl_null",'startVal': .1, "FCfar":0.0, "FCmed":0.0, "FCclose":0.1,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nNull*nBlocks, "minVal":0, "maxVal":.1}, 1, nNull*nBlocks]
+    [{"label":"Control_null",'startVal': .1,      "FCmed":0.00, "FCclose":0.10,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},        1, nNull*nBlocks],
+    [{"label":"Control_null",'startVal': .1,      "FCmed":0.00, "FCclose":0.25,  "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},    1, nNull*nBlocks],
+    [{"label":"Equal_null",'startVal': .1,        "FCmed":0.25, "FCclose":0.25, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},     1, nNull*nBlocks],
+    [{"label":"Equal_null",'startVal': .1,        "FCmed":0.10, "FCclose":0.10, "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},     1, nNull*nBlocks],
+    [{"label":"Increase_null",'startVal': .1,     "FCmed":0.10, "FCclose":0.25,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},   1, nNull*nBlocks],
+    [{"label":"Decrease_null",'startVal': .1,     "FCmed":0.25, "FCclose":0.10,   "nReversals":1, "stepType":'log', "stepSizes":0.1, "nUp":nup, "nDown":ndown, "nTrials":nReal*nBlocks, "minVal":0, "maxVal":.1},   1, nNull*nBlocks]
 ]
 
 ############################################################################
@@ -308,9 +303,11 @@ def trialCheckerOG(trialType):
 # %%
 #### Define the experimental loop ####
 breakTrials = np.int16(np.linspace(0,maxTrials,nBlocks+1,endpoint=True)[1:-1]).tolist()
-fixation_t = .2 #pre-stim fixation period duration
+fixation_t = .3 #pre-stim fixation period duration
 stim_t = .2 # stimulus duration (0.2)
 response_t = 1.3 # max time to respond
+IST_t = .3
+fullTrial_t = sum([fixation_t,stim_t,response_t,IST_t])
 
 def pilot():
     global trialTracker
@@ -324,18 +321,6 @@ def pilot():
         thisIntensity = stairs.currentStaircase.intensity
         stairs.currentStaircase.intensities.append(thisIntensity)
         
-#        just for checking on things
-#        print('||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-#        print(stairs.currentStaircase.condition)
-#        print(stairs.currentStaircase.condition['cntrst'])
-#        print(stairs.currentStaircase.intensity)
-#        print('||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-#        print(stairs.currentStaircase.intensities)
-#        print(stairs.currentStaircase.intensities)
-#        print('||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-        
-     #   trialTracker[conditions.index(thisCondition),1] += 1
-        # print(trialNum)
         if trialNum in breakTrials:
             print('-------------------- BREAK TIME --------------------')
             pause.text = f"You have just finished {breakTrials.index(trialNum)+1}. Take a break. Do not press any keys until you are ready to begin again. Then press any key. You cannot continue until at least {break_t} seconds have passed. The next section will be identical to the previous."
@@ -345,20 +330,20 @@ def pilot():
             event.waitKeys()
             OF.countdown(mywin)
         
-        tracker.startRecording(1,1,1,1)
+        if not dummy: tracker.startRecording(1,1,1,1)
         # Set line properties based on the current condition
         logging.log(f"Trial {trialNum} begins: {thisCondition['label']} | {thisIntensity}",logging.DATA)
-        tracker.sendMessage(f"TRIAL_START {trialNum} | {thisCondition['label']} | {thisIntensity}")
+        if not dummy: tracker.sendMessage(f"TRIAL_START {trialNum} | {thisCondition['label']} | {thisIntensity}")
         # line1.contrast = thisCondition['FCfar']
         # line7.contrast = thisCondition['FCfar']
 
         line2.contrast = thisCondition['FCmed']
-        line6.contrast = thisCondition['FCmed']
-
         line3.contrast = thisCondition['FCclose']
-        line5.contrast = thisCondition['FCclose']
-  
         line4.contrast = thisIntensity
+        line5.contrast = thisCondition['FCclose']
+        line6.contrast = thisCondition['FCmed']
+        if thisCondition['label'].endswith('_null'):
+            line4.contrast = 0
         
         #set debug messages
         DebugIntensity = visual.TextStim(win=mywin, pos=[0,-2],colorSpace='rgb',color = [-1,-1,-1],text=thisIntensity)
@@ -367,34 +352,26 @@ def pilot():
         # Draw the first fixation point
         diode.color *= -1 # Diode white now
         OF.drawOrder(fixation,mywin)
+        logging.log("Fixation Start",logging.DATA)
         core.wait(fixation_t)
         diode.color *= -1 # Diode black now
         mywin.flip()
         core.wait(2/60) # 2 frames
         
-        if thisCondition['label'].endswith('_null'):
-            line4.contrast = 0
 
         # Flankers only
         diode.color *= -1 # Diode white now
         OF.drawOrder(lines_null,mywin)
-        logging.log("Stim Appears",logging.DATA)
+        logging.log("Flankers Start",logging.DATA)
         core.wait(IST_t)
-        diode.color *= -1 # Diode back to black
-        OF.drawOrder(message2,mywin)
-        logging.log("Stim Disappears",logging.DATA)
-        trialClock.reset()
-        thisResp=None
-        rt = None
         
         # Draw the lines
-        diode.color *= -1 # Diode white now
         OF.drawOrder(lines,mywin)
-        logging.log("Stim Appears",logging.DATA)
+        logging.log("Target Start",logging.DATA)
         core.wait(stim_t)
         diode.color *= -1 # Diode back to black
         OF.drawOrder(message2,mywin)
-        logging.log("Stim Disappears",logging.DATA)
+        logging.log("Stimulus Disappears",logging.DATA)
         trialClock.reset()
         thisResp=None
         rt = None
@@ -425,15 +402,15 @@ def pilot():
         else:
             thisResp = 0
             rt = 99 # fill in rt w/ 99 if they don't respond
-        tracker.sendMessage(f"TRIAL_END {trialNum} | {thisCondition['label']} | {thisIntensity}")
+        if not dummy: tracker.sendMessage(f"TRIAL_END {trialNum} | {thisCondition['label']} | {thisIntensity}")
         core.wait(response_t-rt)
         # Add the response to the staircase handler    
         stairs.currentStaircase.addResponse(thisResp)
         stairs.totalTrials += 1
 
         # Write the correct response to the data file
-        dataFile.write(f"{nSubject},{trialNum},{thisCondition['label']},{thisCondition['FCfar']},{thisCondition['FCmed']},{thisCondition['FCclose']},{thisIntensity},{thisResp},{rt}\n")
-        tracker.stopRecording()
+        dataFile.write(f"{nSubject},{trialNum},{thisCondition['label']},{thisCondition['FCmed']},{thisCondition['FCclose']},{thisIntensity},{thisResp},{rt}\n")
+        if not dummy: tracker.stopRecording()
 
 #### Define the practice loop ####
 def training():
