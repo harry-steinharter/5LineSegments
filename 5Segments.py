@@ -351,6 +351,7 @@ def pilot():
             
         # Draw the first fixation point
         diode.color *= -1 # Diode white now
+        fixation.color = 'black'
         OF.drawOrder(fixation,mywin)
         logging.log("Fixation Start",logging.DATA)
         core.wait(fixation_t)
@@ -370,7 +371,8 @@ def pilot():
         logging.log("Target Start",logging.DATA)
         core.wait(stim_t)
         diode.color *= -1 # Diode back to black
-        OF.drawOrder(message2,mywin)
+        fixation.color = 'white'
+        OF.drawOrder(fixation,mywin)
         logging.log("Stimulus Disappears",logging.DATA)
         trialClock.reset()
         thisResp=None
@@ -415,7 +417,7 @@ def pilot():
 #### Define the practice loop ####
 def training():
     trials = np.linspace(0,19,20,True,dtype=int).tolist()
-    trialContrast = np.linspace(0,.2,20).tolist()
+    trialContrast = np.linspace(0,.1,20).tolist()
     random.shuffle(trials)
     random.shuffle(trialContrast)
 
@@ -436,16 +438,21 @@ def training():
         midBall.contrast = trialContrast[trial]
 #        midBall.fillColor = i
 
+        fix.color = 'black'
         OF.drawOrder(fix,mywin)
         core.wait(.5)
         if trial % 2:
+            OF.drawOrder(message2,mywin)
+            core.wait(.5)
             OF.drawOrder(midBall if not debug else [midBall,debug_i],mywin)
             core.wait(tStim)
-            OF.drawOrder(message2,mywin)
         else:
+            OF.drawOrder([topBall,bottomBall],mywin)
+            core.wait(.5)
             OF.drawOrder([topBall,midBall,bottomBall] if not debug else [topBall,midBall,bottomBall,debug_i],mywin)
             core.wait(tStim)
-            OF.drawOrder(message2,mywin)
+        fix.color = 'white'
+        OF.drawOrder(fix,mywin)
         
         trialClock.reset()
         allKeys = event.waitKeys(maxWait=maxWait)
