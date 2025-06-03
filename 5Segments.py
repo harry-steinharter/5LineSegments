@@ -152,7 +152,7 @@ offset = math.cos(math.radians(60))*(6/12)
 #### Establish some stuff ####
 nup = 1
 ndown = 1
-nBlocks = 10
+nBlocks = 7
 nReal = 18 # 18 was last experiment
 nNull = 2 # 2 was last experiment4646
 # Define experimental conditions (Different staircase procedures which run independently and randomly)
@@ -366,7 +366,13 @@ def pilot():
         logging.log("Flankers Start",logging.DATA)
         core.wait(IST_t)
         
+        # Redraw with black diode
+        diode.color *= -1 # Diode black now
+        OF.drawOrder(lines_null,mywin)
+        core.wait(2/60) # 2 frames
+        
         # Draw the lines
+        diode.color *= -1 # Diode white now
         OF.drawOrder(lines,mywin)
         logging.log("Target Start",logging.DATA)
         core.wait(stim_t)
