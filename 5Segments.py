@@ -91,9 +91,13 @@ line_Length = 0.5
 #line1=visual.Line(win=mywin, start=(0,2.75), end=(0,3.25),  lineWidth=4.2, pos=(0,0),  colorSpace='rgb')
 line2=visual.Line(win=mywin, start=(0,1.75), end=(0,2.25),  lineWidth=4.2, pos=(0,0),  colorSpace='rgb')
 line3=visual.Line(win=mywin, start=(0,.75), end=(0,1.25),  lineWidth=4.2, pos=(0,0),  colorSpace='rgb')
+#line2=visual.Line(win=mywin, start=(0,0), end=(0,0.5),  lineWidth=4.2, pos=(0,2.25),  colorSpace='rgb')
+#line3=visual.Line(win=mywin, start=(0,0), end=(0,0.5),  lineWidth=4.2, pos=(0,1),  colorSpace='rgb')
 
 line4=visual.Line(win=mywin, start=(0,-0.25), end=(0,0.25),  lineWidth=4.2, pos=(0,0),  colorSpace='rgb')
 
+#line5=visual.Line(win=mywin, start=(0,0), end=(0,-0.5),  lineWidth=4.2, pos=(0,-1),  colorSpace='rgb')
+#line6=visual.Line(win=mywin, start=(0,0), end=(0,-0.5),  lineWidth=4.2, pos=(0,-2.25),  colorSpace='rgb')
 line5=visual.Line(win=mywin, start=(0,-.75), end=(0,-1.25), lineWidth=4.2, pos=(0,0), colorSpace='rgb')
 line6=visual.Line(win=mywin, start=(0,-1.75), end=(0,-2.25), lineWidth=4.2, pos=(0,0), colorSpace='rgb')
 #line7=visual.Line(win=mywin, start=(0,-2.75), end=(0,-3.25), lineWidth=4.2, pos=(0,0), colorSpace='rgb')
